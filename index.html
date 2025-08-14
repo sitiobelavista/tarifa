@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calcule a tarifa de sua estadia no Sítio Bela Vista</title>
   <style>
     #result {
@@ -44,38 +44,24 @@
   </p>
 
   <script>
-    let rentalRates;
+    let rentalRates = [];
 
-    fetch('tarifas.json')
+    fetch('tarifas_corrigido_final.json')
       .then(response => response.json())
-      .then(data => {
-        rentalRates = data;
-      })
-      .catch(error => {
-        console.error('Erro ao carregar o arquivo JSON:', error);
-      });
+      .then(data => rentalRates = data)
+      .catch(error => console.error('Erro ao carregar tarifas:', error));
 
-    function formatDateForComparison(date) {
+    function formatDate(date) {
       const d = new Date(date);
-      let day = '' + d.getDate();
-      let month = '' + (d.getMonth() + 1);
-      const year = d.getFullYear();
-      if (day.length < 2) day = '0' + day;
-      if (month.length < 2) month = '0' + month;
-      return [year, month, day].join('-');
+      return d.toISOString().split('T')[0];
     }
 
-    function formatDateForDisplay(date) {
+    function formatDisplayDate(date) {
       const d = new Date(date);
-      let day = '' + d.getDate();
-      let month = '' + (d.getMonth() + 1);
-      const year = d.getFullYear();
-      if (day.length < 2) day = '0' + day;
-      if (month.length < 2) month = '0' + month;
-      return [day, month, year].join('-');
+      return d.toLocaleDateString('pt-BR');
     }
 
-    document.getElementById('rentalForm').addEventListener('submit', function (event) {
+    document.getElementById('rentalForm').addEventListener('submit', function(event) {
       event.preventDefault();
 
       const numPeople = parseInt(document.getElementById('numPeople').value);
@@ -87,58 +73,46 @@
         return;
       }
 
-      let totalCost = 0;
-      let currentDate = new Date(startDate);
+      let total = 0;
+      let current = new Date(startDate);
 
-      while (currentDate <= endDate) {
-        const formattedDate = formatDateForComparison(currentDate);
-        const dayRate = rentalRates.find(rate => rate.Data === formattedDate);
+      while (current <= endDate) {
+        const dateKey = formatDate(current);
+        const rate = rentalRates.find(r => r.Data === dateKey);
 
-        if (!dayRate) {
-          document.getElementById('result').innerText = `Não há tarifas disponíveis para a data ${formattedDate}.`;
+        if (!rate) {
+          document.getElementById('result').innerText = `Tarifa não encontrada para ${dateKey}`;
           return;
         }
 
-        let rate;
-        let additionalRate = 0;
-
-        if (numPeople <= 20) {
-          rate = parseFloat(dayRate['Até 20 pessoas']);
-        } else if (numPeople <= 30) {
-          rate = parseFloat(dayRate['21 a 30 pessoas']);
-        } else if (numPeople <= 40) {
-          rate = parseFloat(dayRate['31 a 40 pessoas']);
-        } else {
-          rate = parseFloat(dayRate['31 a 40 pessoas']);
-          if (dayRate['Adicional'] !== undefined) {
-            additionalRate = parseFloat(dayRate['Adicional']) * (numPeople - 40);
-          }
+        let baseRate = 0;
+        if (numPeople <= 20) baseRate = rate["Até 20 pessoas"];
+        else if (numPeople <= 30) baseRate = rate["21 a 30 pessoas"];
+        else if (numPeople <= 40) baseRate = rate["31 a 40 pessoas"];
+        else {
+          const extras = numPeople - 40;
+          baseRate = rate["31 a 40 pessoas"];
+          total += extras * rate["Adicional"];
         }
 
-        totalCost += rate * Math.min(numPeople, 40);
-        totalCost += additionalRate;
-
-        currentDate.setDate(currentDate.getDate() + 1);
+        total += baseRate * Math.min(numPeople, 40);
+        current.setDate(current.getDate() + 1);
       }
 
-      if (totalCost < 1500) {
-        totalCost = 1500;
-      }
+      if (total < 1500) total = 1500;
 
-      document.getElementById('result').innerText = `O valor total da estadia é R$ ${totalCost.toFixed(2)}`;
+      document.getElementById('result').innerText = `O valor total da estadia é R$ ${total.toFixed(2)}`;
       document.getElementById('additionalInfo').style.display = 'block';
 
-      const whatsappMessage =
-        `Olá, gostaria de conversar sobre uma reserva com as seguintes informações:\n\n` +
-        `Número de pessoas: ${numPeople}\n` +
-        `Data de início: ${formatDateForDisplay(startDate)}\n` +
-        `Data de fim: ${formatDateForDisplay(endDate)}\n` +
-        `Valor total da estadia: R$ ${totalCost.toFixed(2)}`;
+      const message = `Olá, gostaria de conversar sobre uma reserva com as seguintes informações:\n\n` +
+                      `Número de pessoas: ${numPeople}\n` +
+                      `Data de início: ${formatDisplayDate(startDate)}\n` +
+                      `Data de fim: ${formatDisplayDate(endDate)}\n` +
+                      `Valor total da estadia: R$ ${total.toFixed(2)}`;
 
-      const whatsappLink = document.getElementById('whatsappLink');
-      whatsappLink.href = `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(whatsappMessage)}`;
+      document.getElementById('whatsappLink').href =
+        `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(message)}`;
     });
   </script>
 </body>
 </html>
-

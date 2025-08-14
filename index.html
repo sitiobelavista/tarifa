@@ -26,12 +26,11 @@
 
         <button type="submit">Calcular Tarifa</button><br><br>
 
-        <p><strong>OBSERVAÇÃO:</strong> 
-            Os seguintes periodos só estão disponíveis para pacotes completos:<br><br>
-                •  <strong>Consciência Negra 2025:</strong> 20/11 a 23/11<br>
-                •  <strong>Natal 2025:</strong> 24/12 a 28/12<br>
-                •  <strong>Ano Novo 2025:</strong> 31/12 a 04/01<br>
-                •  <strong>Carnaval 2026:</strong> 14/02 a 17/02
+        <p><strong>OBSERVAÇÃO:</strong> Os seguintes períodos só estão disponíveis para pacotes completos:<br><br>
+            •  <strong>Consciência Negra 2025:</strong> 20/11 a 23/11<br>
+            •  <strong>Natal 2025:</strong> 24/12 a 28/12<br>
+            •  <strong>Ano Novo 2025:</strong> 31/12 a 04/01<br>
+            •  <strong>Carnaval 2026:</strong> 14/02 a 17/02
         </p><br>
     </form>
 
@@ -60,6 +59,7 @@
             let day = '' + d.getDate();
             let month = '' + (d.getMonth() + 1);
             const year = d.getFullYear();
+
             if (day.length < 2) day = '0' + day;
             if (month.length < 2) month = '0' + month;
             return [year, month, day].join('-');
@@ -70,6 +70,7 @@
             let day = '' + d.getDate();
             let month = '' + (d.getMonth() + 1);
             const year = d.getFullYear();
+
             if (day.length < 2) day = '0' + day;
             if (month.length < 2) month = '0' + month;
             return [day, month, year].join('-');
@@ -89,13 +90,15 @@
 
             let totalCost = 0;
             let currentDate = new Date(startDate);
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
 
-            while (currentDate <= endDate) {
-                const formattedDate = formatDateForComparison(currentDate);
-                const dayRate = rentalRates.find(rate => rate.Data === formattedDate); // <- CORRIGIDO AQUI
+            while (currentDate <= end) {
+                const formattedDateForComparison = formatDateForComparison(currentDate);
+                const dayRate = rentalRates.find(rate => rate.Data === formattedDateForComparison);
 
                 if (!dayRate) {
-                    document.getElementById('result').innerText = `Não há tarifas disponíveis para a data ${formattedDate}.`;
+                    document.getElementById('result').innerText = `Não há tarifas disponíveis para a data ${formattedDateForComparison}.`;
                     return;
                 }
 
@@ -134,8 +137,7 @@
                                     `Data de fim: ${formatDateForDisplay(endDate)}\n` +
                                     `Valor total da estadia: R$ ${totalCost.toFixed(2)}`;
 
-            const whatsappLink = document.getElementById('whatsappLink');
-            whatsappLink.href = `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(whatsappMessage)}`;
+            document.getElementById('whatsappLink').href = `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(whatsappMessage)}`;
         });
     </script>
 </body>

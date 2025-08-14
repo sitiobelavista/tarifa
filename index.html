@@ -46,7 +46,7 @@
   <script>
     let rentalRates = [];
 
-    fetch('tarifas_corrigido_final.json')
+    fetch('tarifas.json')
       .then(response => response.json())
       .then(data => rentalRates = data)
       .catch(error => console.error('Erro ao carregar tarifas:', error));
@@ -116,3 +116,4 @@
   </script>
 </body>
 </html>
+

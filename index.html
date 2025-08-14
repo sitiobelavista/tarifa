@@ -27,7 +27,7 @@
         <button type="submit">Calcular Tarifa</button><br><br>
 
         <p><strong>OBSERVAÇÃO:</strong> 
-            Os seguintes periodos só estão disponíveis para pacotes completos:<br><br>
+            Os seguintes períodos só estão disponíveis para pacotes completos:<br><br>
                 •  <strong>Consciência Negra 2024:</strong> 20/11 a 23/11<br>
                 •  <strong>Natal 2025:</strong> 24/12 a 28/12<br>
                 •  <strong>Ano Novo 2025:</strong> 31/12 a 04/01<br>
@@ -44,9 +44,9 @@
     </p>
 
     <script>
-        let rentalRates;
+        let rentalRates = [];
 
-        fetch('tarifas.json')
+        fetch('tarifas_corrigido.json')
             .then(response => response.json())
             .then(data => {
                 rentalRates = data;
@@ -57,22 +57,18 @@
 
         function formatDateForComparison(date) {
             const d = new Date(date);
-            let day = '' + d.getDate();
-            let month = '' + (d.getMonth() + 1);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
             const year = d.getFullYear();
-            if (day.length < 2) day = '0' + day;
-            if (month.length < 2) month = '0' + month;
-            return [year, month, day].join('-');
+            return `${year}-${month}-${day}`;
         }
 
         function formatDateForDisplay(date) {
             const d = new Date(date);
-            let day = '' + d.getDate();
-            let month = '' + (d.getMonth() + 1);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
             const year = d.getFullYear();
-            if (day.length < 2) day = '0' + day;
-            if (month.length < 2) month = '0' + month;
-            return [day, month, year].join('-');
+            return `${day}-${month}-${year}`;
         }
 
         document.getElementById('rentalForm').addEventListener('submit', function(event) {
@@ -92,31 +88,31 @@
 
             while (currentDate <= endDate) {
                 const formattedDate = formatDateForComparison(currentDate);
-                const dayRate = rentalRates.find(rate => rate.Data === formattedDate); // <- CORRIGIDO AQUI
+                const dayRate = rentalRates.find(rate => rate.Data === formattedDate);
 
                 if (!dayRate) {
                     document.getElementById('result').innerText = `Não há tarifas disponíveis para a data ${formattedDate}.`;
                     return;
                 }
 
-                let rate;
+                let baseRate = 0;
                 let additionalRate = 0;
 
                 if (numPeople <= 20) {
-                    rate = dayRate['Até 20 pessoas'];
+                    baseRate = dayRate["Até 20 pessoas"];
+                    totalCost += baseRate * numPeople;
                 } else if (numPeople <= 30) {
-                    rate = dayRate['21 a 30 pessoas'];
+                    baseRate = dayRate["21 a 30 pessoas"];
+                    totalCost += baseRate * numPeople;
                 } else if (numPeople <= 40) {
-                    rate = dayRate['31 a 40 pessoas'];
+                    baseRate = dayRate["31 a 40 pessoas"];
+                    totalCost += baseRate * numPeople;
                 } else {
-                    rate = dayRate['31 a 40 pessoas'];
-                    if (dayRate['Adicional'] !== undefined) {
-                        additionalRate = dayRate['Adicional'] * (numPeople - 40);
-                    }
+                    baseRate = dayRate["31 a 40 pessoas"];
+                    const extras = numPeople - 40;
+                    additionalRate = dayRate["Adicional"] || 0;
+                    totalCost += (baseRate * 40) + (additionalRate * extras);
                 }
-
-                totalCost += rate * Math.min(numPeople, 40);
-                totalCost += additionalRate;
 
                 currentDate.setDate(currentDate.getDate() + 1);
             }
@@ -134,10 +130,9 @@
                                     `Data de fim: ${formatDateForDisplay(endDate)}\n` +
                                     `Valor total da estadia: R$ ${totalCost.toFixed(2)}`;
 
-            const whatsappLink = document.getElementById('whatsappLink');
-            whatsappLink.href = `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(whatsappMessage)}`;
+            document.getElementById('whatsappLink').href =
+                `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(whatsappMessage)}`;
         });
     </script>
 </body>
 </html>
-

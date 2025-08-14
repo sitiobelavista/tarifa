@@ -1,144 +1,144 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcule a tarifa de sua estadia no Sítio Bela Vista</title>
-    <style>
-        #result {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calcule a tarifa de sua estadia no Sítio Bela Vista</title>
+  <style>
+    #result {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Calcule a tarifa de sua estadia no Sítio Bela Vista</h1>
-    <form id="rentalForm">
-        <label for="numPeople">Número de pessoas:</label>
-        <input type="number" id="numPeople" min="1" required><br><br>
+  <h1>Calcule a tarifa de sua estadia no Sítio Bela Vista</h1>
+  <form id="rentalForm">
+    <label for="numPeople">Número de pessoas:</label>
+    <input type="number" id="numPeople" min="1" required><br><br>
 
-        <label for="startDate">Data de início:</label>
-        <input type="date" id="startDate" required> <strong>Check-in às 17 hrs do dia anterior</strong><br><br>
-        
-        <label for="endDate">Data de fim:</label>
-        <input type="date" id="endDate" required><br><br>
+    <label for="startDate">Data de início:</label>
+    <input type="date" id="startDate" required>
+    <strong>Check-in às 17 hrs do dia anterior</strong><br><br>
 
-        <button type="submit">Calcular Tarifa</button><br><br>
+    <label for="endDate">Data de fim:</label>
+    <input type="date" id="endDate" required><br><br>
 
-        <p><strong>OBSERVAÇÃO:</strong> Os seguintes períodos só estão disponíveis para pacotes completos:<br><br>
-            •  <strong>Consciência Negra 2025:</strong> 20/11 a 23/11<br>
-            •  <strong>Natal 2025:</strong> 24/12 a 28/12<br>
-            •  <strong>Ano Novo 2025:</strong> 31/12 a 04/01<br>
-            •  <strong>Carnaval 2026:</strong> 14/02 a 17/02
-        </p><br>
-    </form>
+    <button type="submit">Calcular Tarifa</button><br><br>
 
-    <p id="result"></p>
+    <p><strong>OBSERVAÇÃO:</strong> Os seguintes períodos só estão disponíveis para pacotes completos:<br><br>
+      • <strong>Consciência Negra 2024:</strong> 20/11 a 23/11<br>
+      • <strong>Natal 2025:</strong> 24/12 a 28/12<br>
+      • <strong>Ano Novo 2025:</strong> 31/12 a 04/01<br>
+      • <strong>Carnaval 2026:</strong> 14/02 a 17/02
+    </p><br>
+  </form>
 
-    <p id="additionalInfo" style="display: none;">
-        Clique <a href="https://drive.google.com/drive/folders/1gfjK_byvgLT5Sh_l2K0xPQZn5EeEcDGk?usp=sharing" target="_blank">aqui</a> para fazer download de fotos e descrição completa dos espaços.<br><br>
-        Quer agendar uma visita ou confirmar reserva? Mande mensagem no <a id="whatsappLink" href="#" target="_blank">WhatsApp</a>, com as informações fornecidas acima, clicando aqui.<br><br>
-        Link da localização do sítio <a href="https://g.co/kgs/HXPNtEc" target="_blank">aqui</a>.
-    </p>
+  <p id="result"></p>
 
-    <script>
-        let rentalRates;
+  <p id="additionalInfo" style="display: none;">
+    Clique <a href="https://drive.google.com/drive/folders/1gfjK_byvgLT5Sh_l2K0xPQZn5EeEcDGk?usp=sharing" target="_blank">aqui</a> para fazer download de fotos e descrição completa dos espaços.<br><br>
+    Quer agendar uma visita ou confirmar reserva? Mande mensagem no <a id="whatsappLink" href="#" target="_blank">WhatsApp</a>, com as informações fornecidas acima, clicando aqui.<br><br>
+    Link da localização do sítio <a href="https://g.co/kgs/HXPNtEc" target="_blank">aqui</a>.
+  </p>
 
-        fetch('tarifas.json')
-            .then(response => response.json())
-            .then(data => {
-                rentalRates = data;
-            })
-            .catch(error => {
-                console.error('Erro ao carregar o arquivo JSON:', error);
-            });
+  <script>
+    let rentalRates;
 
-        function formatDateForComparison(date) {
-            const d = new Date(date);
-            let day = '' + d.getDate();
-            let month = '' + (d.getMonth() + 1);
-            const year = d.getFullYear();
+    fetch('tarifas.json')
+      .then(response => response.json())
+      .then(data => {
+        rentalRates = data;
+      })
+      .catch(error => {
+        console.error('Erro ao carregar o arquivo JSON:', error);
+      });
 
-            if (day.length < 2) day = '0' + day;
-            if (month.length < 2) month = '0' + month;
-            return [year, month, day].join('-');
+    function formatDateForComparison(date) {
+      const d = new Date(date);
+      let day = '' + d.getDate();
+      let month = '' + (d.getMonth() + 1);
+      const year = d.getFullYear();
+      if (day.length < 2) day = '0' + day;
+      if (month.length < 2) month = '0' + month;
+      return [year, month, day].join('-');
+    }
+
+    function formatDateForDisplay(date) {
+      const d = new Date(date);
+      let day = '' + d.getDate();
+      let month = '' + (d.getMonth() + 1);
+      const year = d.getFullYear();
+      if (day.length < 2) day = '0' + day;
+      if (month.length < 2) month = '0' + month;
+      return [day, month, year].join('-');
+    }
+
+    document.getElementById('rentalForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const numPeople = parseInt(document.getElementById('numPeople').value);
+      const startDate = new Date(document.getElementById('startDate').value);
+      const endDate = new Date(document.getElementById('endDate').value);
+
+      if (startDate > endDate) {
+        document.getElementById('result').innerText = "A data de fim deve ser maior que a data de início.";
+        return;
+      }
+
+      let totalCost = 0;
+      let currentDate = new Date(startDate);
+
+      while (currentDate <= endDate) {
+        const formattedDate = formatDateForComparison(currentDate);
+        const dayRate = rentalRates.find(rate => rate.Data === formattedDate);
+
+        if (!dayRate) {
+          document.getElementById('result').innerText = `Não há tarifas disponíveis para a data ${formattedDate}.`;
+          return;
         }
 
-        function formatDateForDisplay(date) {
-            const d = new Date(date);
-            let day = '' + d.getDate();
-            let month = '' + (d.getMonth() + 1);
-            const year = d.getFullYear();
+        let rate;
+        let additionalRate = 0;
 
-            if (day.length < 2) day = '0' + day;
-            if (month.length < 2) month = '0' + month;
-            return [day, month, year].join('-');
+        if (numPeople <= 20) {
+          rate = parseFloat(dayRate['Até 20 pessoas']);
+        } else if (numPeople <= 30) {
+          rate = parseFloat(dayRate['21 a 30 pessoas']);
+        } else if (numPeople <= 40) {
+          rate = parseFloat(dayRate['31 a 40 pessoas']);
+        } else {
+          rate = parseFloat(dayRate['31 a 40 pessoas']);
+          if (dayRate['Adicional'] !== undefined) {
+            additionalRate = parseFloat(dayRate['Adicional']) * (numPeople - 40);
+          }
         }
 
-        document.getElementById('rentalForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        totalCost += rate * Math.min(numPeople, 40);
+        totalCost += additionalRate;
 
-            const numPeople = parseInt(document.getElementById('numPeople').value);
-            const startDate = new Date(document.getElementById('startDate').value);
-            const endDate = new Date(document.getElementById('endDate').value);
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
 
-            if (startDate > endDate) {
-                document.getElementById('result').innerText = "A data de fim deve ser maior que a data de início.";
-                return;
-            }
+      if (totalCost < 1500) {
+        totalCost = 1500;
+      }
 
-            let totalCost = 0;
-            let currentDate = new Date(startDate);
-            const end = new Date(endDate);
-            end.setHours(23, 59, 59, 999);
+      document.getElementById('result').innerText = `O valor total da estadia é R$ ${totalCost.toFixed(2)}`;
+      document.getElementById('additionalInfo').style.display = 'block';
 
-            while (currentDate <= end) {
-                const formattedDateForComparison = formatDateForComparison(currentDate);
-                const dayRate = rentalRates.find(rate => rate.Data === formattedDateForComparison);
+      const whatsappMessage =
+        `Olá, gostaria de conversar sobre uma reserva com as seguintes informações:\n\n` +
+        `Número de pessoas: ${numPeople}\n` +
+        `Data de início: ${formatDateForDisplay(startDate)}\n` +
+        `Data de fim: ${formatDateForDisplay(endDate)}\n` +
+        `Valor total da estadia: R$ ${totalCost.toFixed(2)}`;
 
-                if (!dayRate) {
-                    document.getElementById('result').innerText = `Não há tarifas disponíveis para a data ${formattedDateForComparison}.`;
-                    return;
-                }
-
-                let rate;
-                let additionalRate = 0;
-
-                if (numPeople <= 20) {
-                    rate = dayRate['Até 20 pessoas'];
-                } else if (numPeople <= 30) {
-                    rate = dayRate['21 a 30 pessoas'];
-                } else if (numPeople <= 40) {
-                    rate = dayRate['31 a 40 pessoas'];
-                } else {
-                    rate = dayRate['31 a 40 pessoas'];
-                    if (dayRate['Adicional'] !== undefined) {
-                        additionalRate = dayRate['Adicional'] * (numPeople - 40);
-                    }
-                }
-
-                totalCost += rate * Math.min(numPeople, 40);
-                totalCost += additionalRate;
-
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-
-            if (totalCost < 1500) {
-                totalCost = 1500;
-            }
-
-            document.getElementById('result').innerText = `O valor total da estadia é R$ ${totalCost.toFixed(2)}`;
-            document.getElementById('additionalInfo').style.display = 'block';
-
-            const whatsappMessage = `Olá, gostaria de conversar sobre uma reserva com as seguintes informações:\n\n` +
-                                    `Número de pessoas: ${numPeople}\n` +
-                                    `Data de início: ${formatDateForDisplay(startDate)}\n` +
-                                    `Data de fim: ${formatDateForDisplay(endDate)}\n` +
-                                    `Valor total da estadia: R$ ${totalCost.toFixed(2)}`;
-
-            document.getElementById('whatsappLink').href = `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(whatsappMessage)}`;
-        });
-    </script>
+      const whatsappLink = document.getElementById('whatsappLink');
+      whatsappLink.href = `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(whatsappMessage)}`;
+    });
+  </script>
 </body>
 </html>
+

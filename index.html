@@ -85,6 +85,7 @@
 
             let totalCost = 0;
             let currentDate = new Date(startDate);
+            currentDate.setDate(currentDate.getDate() - 1); // Check-in no dia anterior
 
             while (currentDate <= endDate) {
                 const formattedDate = formatDateForComparison(currentDate);

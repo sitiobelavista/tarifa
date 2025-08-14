@@ -27,8 +27,8 @@
         <button type="submit">Calcular Tarifa</button><br><br>
 
         <p><strong>OBSERVAÇÃO:</strong> 
-            Os seguintes períodos só estão disponíveis para pacotes completos:<br><br>
-                •  <strong>Consciência Negra 2024:</strong> 20/11 a 23/11<br>
+            Os seguintes periodos só estão disponíveis para pacotes completos:<br><br>
+                •  <strong>Consciência Negra 2025:</strong> 20/11 a 23/11<br>
                 •  <strong>Natal 2025:</strong> 24/12 a 28/12<br>
                 •  <strong>Ano Novo 2025:</strong> 31/12 a 04/01<br>
                 •  <strong>Carnaval 2026:</strong> 14/02 a 17/02
@@ -44,9 +44,9 @@
     </p>
 
     <script>
-        let rentalRates = [];
+        let rentalRates;
 
-        fetch('tarifas_corrigido.json')
+        fetch('tarifas.json')
             .then(response => response.json())
             .then(data => {
                 rentalRates = data;
@@ -57,18 +57,22 @@
 
         function formatDateForComparison(date) {
             const d = new Date(date);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
+            let day = '' + d.getDate();
+            let month = '' + (d.getMonth() + 1);
             const year = d.getFullYear();
-            return `${year}-${month}-${day}`;
+            if (day.length < 2) day = '0' + day;
+            if (month.length < 2) month = '0' + month;
+            return [year, month, day].join('-');
         }
 
         function formatDateForDisplay(date) {
             const d = new Date(date);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
+            let day = '' + d.getDate();
+            let month = '' + (d.getMonth() + 1);
             const year = d.getFullYear();
-            return `${day}-${month}-${year}`;
+            if (day.length < 2) day = '0' + day;
+            if (month.length < 2) month = '0' + month;
+            return [day, month, year].join('-');
         }
 
         document.getElementById('rentalForm').addEventListener('submit', function(event) {
@@ -85,35 +89,34 @@
 
             let totalCost = 0;
             let currentDate = new Date(startDate);
-            currentDate.setDate(currentDate.getDate() - 1); // Check-in no dia anterior
 
             while (currentDate <= endDate) {
                 const formattedDate = formatDateForComparison(currentDate);
-                const dayRate = rentalRates.find(rate => rate.Data === formattedDate);
+                const dayRate = rentalRates.find(rate => rate.Data === formattedDate); // <- CORRIGIDO AQUI
 
                 if (!dayRate) {
                     document.getElementById('result').innerText = `Não há tarifas disponíveis para a data ${formattedDate}.`;
                     return;
                 }
 
-                let baseRate = 0;
+                let rate;
                 let additionalRate = 0;
 
                 if (numPeople <= 20) {
-                    baseRate = dayRate["Até 20 pessoas"];
-                    totalCost += baseRate * numPeople;
+                    rate = dayRate['Até 20 pessoas'];
                 } else if (numPeople <= 30) {
-                    baseRate = dayRate["21 a 30 pessoas"];
-                    totalCost += baseRate * numPeople;
+                    rate = dayRate['21 a 30 pessoas'];
                 } else if (numPeople <= 40) {
-                    baseRate = dayRate["31 a 40 pessoas"];
-                    totalCost += baseRate * numPeople;
+                    rate = dayRate['31 a 40 pessoas'];
                 } else {
-                    baseRate = dayRate["31 a 40 pessoas"];
-                    const extras = numPeople - 40;
-                    additionalRate = dayRate["Adicional"] || 0;
-                    totalCost += (baseRate * 40) + (additionalRate * extras);
+                    rate = dayRate['31 a 40 pessoas'];
+                    if (dayRate['Adicional'] !== undefined) {
+                        additionalRate = dayRate['Adicional'] * (numPeople - 40);
+                    }
                 }
+
+                totalCost += rate * Math.min(numPeople, 40);
+                totalCost += additionalRate;
 
                 currentDate.setDate(currentDate.getDate() + 1);
             }
@@ -131,8 +134,8 @@
                                     `Data de fim: ${formatDateForDisplay(endDate)}\n` +
                                     `Valor total da estadia: R$ ${totalCost.toFixed(2)}`;
 
-            document.getElementById('whatsappLink').href =
-                `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(whatsappMessage)}`;
+            const whatsappLink = document.getElementById('whatsappLink');
+            whatsappLink.href = `https://api.whatsapp.com/send?phone=+5515997555580&text=${encodeURIComponent(whatsappMessage)}`;
         });
     </script>
 </body>
